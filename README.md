@@ -1,7 +1,12 @@
-Steps:
+# Steps:
+1. Initialize environment
 ```
-python3 -m venv .venv
-source .venv/bin/activate
-python3 -m pip install --upgrade pip
-python3 -m pip install -r requirements.txt
+chmod u+x init.sh
+. ./init.sh
+```
+
+2. download data
+```
+cd data/NQ
+python create_NQ_trian_vali.py
 ```

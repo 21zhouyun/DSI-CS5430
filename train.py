@@ -67,12 +67,12 @@ def compute_metrics(eval_preds):
 
 
 def main():
-    model_name = "t5-large"
+    model_name = "t5-base"
     L = 32  # only use the first 32 tokens of documents (including title)
 
     # We use wandb to log Hits scores after each epoch. Note, this script does not save model checkpoints.
     wandb.login()
-    wandb.init(project="DSI", name='NQ-10k-t5-large')
+    wandb.init(project="DSI", name='NQ-10k-t5-base')
 
     tokenizer = T5Tokenizer.from_pretrained(model_name, cache_dir='cache')
     model = T5ForConditionalGeneration.from_pretrained(model_name, cache_dir='cache')
@@ -125,7 +125,9 @@ def main():
         dataloader_drop_last=False,  # necessary
         report_to='wandb',
         logging_steps=50,
-        save_strategy='no',
+        save_strategy='steps',
+        save_steps=100,
+        save_total_limit=3,
         # fp16=True,  # gives 0/nan loss at some point during training, seems this is a transformers bug.
         dataloader_num_workers=10,
         # gradient_accumulation_steps=2
@@ -145,8 +147,7 @@ def main():
         callbacks=[QueryEvalCallback(test_dataset, wandb, restrict_decode_vocab, training_args, tokenizer)],
         restrict_decode_vocab=restrict_decode_vocab
     )
-    trainer.train(
-    )
+    trainer.train()
 
 
 if __name__ == "__main__":
