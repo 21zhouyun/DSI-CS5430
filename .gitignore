@@ -128,3 +128,10 @@ dmypy.json
 # Pyre type checker
 .pyre/
 .DS_Store
+data/NQ/NQ_10k_multi_task_train.json
+data/NQ/NQ_10k_valid.json
+slurm*
+
+# misc
+wandb
+output

@@ -6,6 +6,7 @@ import torch
 import wandb
 from torch.utils.data import DataLoader
 from tqdm import tqdm
+import argparse
 
 
 class QueryEvalCallback(TrainerCallback):
@@ -66,7 +67,18 @@ def compute_metrics(eval_preds):
     return {'accuracy': num_correct / num_predict}
 
 
+def get_args():
+    parser = argparse.ArgumentParser(description='Optional app description')
+    parser.add_argument('train_data', type=str)
+    parser.add_argument('validation_data', type=str)
+    parser.add_argument('output_dir', type=str)
+
+    args = parser.parse_args()
+    return args
+
 def main():
+    args = get_args()
+
     model_name = "t5-base"
     L = 32  # only use the first 32 tokens of documents (including title)
 
@@ -77,19 +89,19 @@ def main():
     tokenizer = T5Tokenizer.from_pretrained(model_name, cache_dir='cache')
     model = T5ForConditionalGeneration.from_pretrained(model_name, cache_dir='cache')
 
-    train_dataset = IndexingTrainDataset(path_to_data='data/NQ/NQ_10k_multi_task_train.json',
+    train_dataset = IndexingTrainDataset(path_to_data=args["train_data"],
                                          max_length=L,
                                          cache_dir='cache',
                                          tokenizer=tokenizer)
     
     # This eval set is really not the 'eval' set but used to report if the model can memorise (index) all training data points.
-    eval_dataset = IndexingTrainDataset(path_to_data='data/NQ/NQ_10k_multi_task_train.json',
+    eval_dataset = IndexingTrainDataset(path_to_data=args["train_data"],
                                         max_length=L,
                                         cache_dir='cache',
                                         tokenizer=tokenizer)
     
     # This is the actual eval set.
-    test_dataset = IndexingTrainDataset(path_to_data='data/NQ/NQ_10k_valid.json',
+    test_dataset = IndexingTrainDataset(path_to_data=args["validation_data"],
                                         max_length=L,
                                         cache_dir='cache',
                                         tokenizer=tokenizer)
@@ -113,7 +125,7 @@ def main():
     ################################################################
 
     training_args = TrainingArguments(
-        output_dir="./results",
+        output_dir=args["output_dir"],
         learning_rate=0.0005,
         warmup_steps=10000,
         # weight_decay=0.01,
