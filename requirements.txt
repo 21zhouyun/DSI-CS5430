@@ -2,3 +2,5 @@ datasets
 wandb
 transformers
 accelerate
+torch
+sentencepiece

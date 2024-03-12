@@ -135,3 +135,4 @@ slurm*
 # misc
 wandb
 output
+cache

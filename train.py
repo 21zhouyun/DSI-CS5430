@@ -69,11 +69,12 @@ def compute_metrics(eval_preds):
 
 def get_args():
     parser = argparse.ArgumentParser(description='Optional app description')
-    parser.add_argument('train_data', type=str)
-    parser.add_argument('validation_data', type=str)
-    parser.add_argument('output_dir', type=str)
+    parser.add_argument('--train_data', type=str)
+    parser.add_argument('--validation_data', type=str)
+    parser.add_argument('--output_dir', type=str)
 
     args = parser.parse_args()
+    print("arguments:", args)
     return args
 
 def main():
@@ -89,19 +90,19 @@ def main():
     tokenizer = T5Tokenizer.from_pretrained(model_name, cache_dir='cache')
     model = T5ForConditionalGeneration.from_pretrained(model_name, cache_dir='cache')
 
-    train_dataset = IndexingTrainDataset(path_to_data=args["train_data"],
+    train_dataset = IndexingTrainDataset(path_to_data=args.train_data,
                                          max_length=L,
                                          cache_dir='cache',
                                          tokenizer=tokenizer)
     
     # This eval set is really not the 'eval' set but used to report if the model can memorise (index) all training data points.
-    eval_dataset = IndexingTrainDataset(path_to_data=args["train_data"],
+    eval_dataset = IndexingTrainDataset(path_to_data=args.train_data,
                                         max_length=L,
                                         cache_dir='cache',
                                         tokenizer=tokenizer)
     
     # This is the actual eval set.
-    test_dataset = IndexingTrainDataset(path_to_data=args["validation_data"],
+    test_dataset = IndexingTrainDataset(path_to_data=args.validation_data,
                                         max_length=L,
                                         cache_dir='cache',
                                         tokenizer=tokenizer)
@@ -125,7 +126,7 @@ def main():
     ################################################################
 
     training_args = TrainingArguments(
-        output_dir=args["output_dir"],
+        output_dir=args.output_dir,
         learning_rate=0.0005,
         warmup_steps=10000,
         # weight_decay=0.01,
@@ -141,7 +142,7 @@ def main():
         save_steps=100,
         save_total_limit=3,
         # fp16=True,  # gives 0/nan loss at some point during training, seems this is a transformers bug.
-        dataloader_num_workers=10,
+        dataloader_num_workers=2,
         # gradient_accumulation_steps=2
     )
 

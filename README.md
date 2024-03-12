@@ -1,12 +1,4 @@
-# Steps:
-1. Initialize environment
-```
-chmod u+x init.sh
-. ./init.sh
-```
-
-2. download data
-```
-cd data/NQ
-python create_NQ_trian_vali.py
-```
+In the project root directory:
+1. bash init.sh
+2. push your wandb API key in ~/.bashrc
+3. sbatch run.sh <train_data_path> <validation_data_path> <output_path>
