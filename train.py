@@ -7,6 +7,15 @@ import wandb
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 import argparse
+from transformers import LogitsProcessorList
+from transformers import LogitsProcessor
+import torch
+
+class GumbelLogitsProcessor(LogitsProcessor):
+    def __call__(self, input_ids: torch.LongTensor, scores: torch.FloatTensor):
+        gumbel_noise = torch.distributions.Gumbel(0, 1).sample(scores.shape).to(scores.device)
+        return scores + gumbel_noise
+
 
 
 class QueryEvalCallback(TrainerCallback):
@@ -27,6 +36,10 @@ class QueryEvalCallback(TrainerCallback):
             drop_last=False,
             num_workers=self.args.dataloader_num_workers,
         )
+        self.logits_processor = LogitsProcessorList([
+            GumbelLogitsProcessor()
+        ])
+
 
     def on_epoch_end(self, args, state, control, **kwargs):
         hit_at_1 = 0
@@ -39,6 +52,7 @@ class QueryEvalCallback(TrainerCallback):
                     inputs['input_ids'].to(model.device),
                     max_length=20,
                     num_beams=10,
+                    logits_processor=self.logits_processor,  # TO CHECK
                     prefix_allowed_tokens_fn=self.restrict_decode_vocab,
                     num_return_sequences=10,
                     early_stopping=True, ).reshape(inputs['input_ids'].shape[0], 10, -1)
@@ -69,9 +83,9 @@ def compute_metrics(eval_preds):
 
 def get_args():
     parser = argparse.ArgumentParser(description='Optional app description')
-    parser.add_argument('--train_data', type=str)
-    parser.add_argument('--validation_data', type=str)
-    parser.add_argument('--output_dir', type=str)
+    parser.add_argument('--train_data', type=str, default='data/NQ/NQ_10k_multi_task_train_semantic_ids.json')
+    parser.add_argument('--validation_data', type=str, default='data/NQ/NQ_10k_valid_semantic_ids.json')
+    parser.add_argument('--output_dir', type=str, default='results')
 
     args = parser.parse_args()
     print("arguments:", args)
@@ -109,20 +123,34 @@ def main():
 
     ################################################################
     # docid generation constrain, we only generate integer docids.
-    SPIECE_UNDERLINE = "▁"
-    INT_TOKEN_IDS = []
-    for token, id in tokenizer.get_vocab().items():
-        if token[0] == SPIECE_UNDERLINE:
-            if token[1:].isdigit():
-                INT_TOKEN_IDS.append(id)
-        if token == SPIECE_UNDERLINE:
-            INT_TOKEN_IDS.append(id)
-        elif token.isdigit():
-            INT_TOKEN_IDS.append(id)
-    INT_TOKEN_IDS.append(tokenizer.eos_token_id)
+    # SPIECE_UNDERLINE = "▁"
+    # INT_TOKEN_IDS = []
+    # for token, id in tokenizer.get_vocab().items():
+    #     if token[0] == SPIECE_UNDERLINE:
+    #         if token[1:].isdigit():
+    #             INT_TOKEN_IDS.append(id)
+    #     if token == SPIECE_UNDERLINE:
+    #         INT_TOKEN_IDS.append(id)
+    #     elif token.isdigit():
+    #         INT_TOKEN_IDS.append(id)
+    # INT_TOKEN_IDS.append(tokenizer.eos_token_id)
+    
+    # def restrict_decode_vocab(batch_idx, prefix_beam):
+    #     return INT_TOKEN_IDS
 
-    def restrict_decode_vocab(batch_idx, prefix_beam):
-        return INT_TOKEN_IDS
+
+    def restrict_decode_vocab_semantic(tokenizer, trie):
+        def inner(batch_idx, prefix_beam):
+            # Convert token IDs to their corresponding strings, e.g., 'c2', 'c38', etc.
+            prefix_str = [tokenizer.decode([token_id], skip_special_tokens=True) for token_id in prefix_beam]
+            # Get valid next tokens from the trie
+            valid_next_tokens = trie.get_valid_next_tokens(prefix_str)
+            # Convert valid next tokens back to their corresponding token IDs
+            valid_next_token_ids = [tokenizer.encode(token, add_special_tokens=False)[0] for token in valid_next_tokens]
+            return valid_next_token_ids
+        return inner
+
+    # After initializing your tokenizer and trie(havent initialze trie, but the class Trie is already in data.py)
     ################################################################
 
     training_args = TrainingArguments(
@@ -137,9 +165,11 @@ def main():
         max_steps=1000000,
         dataloader_drop_last=False,  # necessary
         report_to='wandb',
-        logging_steps=50,
+        # logging_steps=50,
+        logging_steps=5,
         save_strategy='steps',
-        save_steps=100,
+        # save_steps=100,
+        save_steps=5,
         save_total_limit=3,
         # fp16=True,  # gives 0/nan loss at some point during training, seems this is a transformers bug.
         dataloader_num_workers=2,

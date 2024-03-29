@@ -4,6 +4,49 @@ import datasets
 from torch.utils.data import Dataset
 from transformers import PreTrainedTokenizer, DataCollatorWithPadding
 
+class TrieNode:
+    def __init__(self):
+        self.children = {}
+        self.is_end_of_word = False
+
+class Trie:
+    def __init__(self):
+        self.root = TrieNode()
+
+    def insert(self, key):
+        node = self.root
+        for part in key:
+            if part not in node.children:
+                node.children[part] = TrieNode()
+            node = node.children[part]
+        node.is_end_of_word = True
+
+    def search(self, key):
+        node = self.root
+        for part in key:
+            if part not in node.children:
+                return False
+            node = node.children[part]
+        return node.is_end_of_word
+
+    def starts_with(self, prefix):
+        node = self.root
+        for part in prefix:
+            if part not in node.children:
+                return False
+            node = node.children[part]
+        return True
+
+    def get_valid_next_tokens(self, prefix):
+        node = self.root
+        for part in prefix:
+            if part in node.children:
+                node = node.children[part]
+            else:
+                return []
+        return list(node.children.keys())
+
+
 
 class IndexingTrainDataset(Dataset):
     def __init__(
@@ -35,18 +78,21 @@ class IndexingTrainDataset(Dataset):
                                    return_tensors="pt",
                                    truncation='only_first',
                                    max_length=self.max_length).input_ids[0]
-        return input_ids, str(data['text_id'])
+        # return input_ids, str(data['text_id'])
+        return input_ids, str(data['semantic_ids'])
+        
 
 
 @dataclass
 class IndexingCollator(DataCollatorWithPadding):
     def __call__(self, features):
+        features = features[:500]
         input_ids = [{'input_ids': x[0]} for x in features]
-        docids = [x[1] for x in features]
+        semantic_docids = [x[1] for x in features]
         inputs = super().__call__(input_ids)
 
         labels = self.tokenizer(
-            docids, padding="longest", return_tensors="pt"
+            semantic_docids, padding="longest", return_tensors="pt"
         ).input_ids
 
         # replace padding token id's of the labels by -100 according to https://huggingface.co/docs/transformers/model_doc/t5#training
@@ -58,8 +104,11 @@ class IndexingCollator(DataCollatorWithPadding):
 @dataclass
 class QueryEvalCollator(DataCollatorWithPadding):
     def __call__(self, features):
+        features = features[:500]
         input_ids = [{'input_ids': x[0]} for x in features]
         labels = [x[1] for x in features]
         inputs = super().__call__(input_ids)
 
         return inputs, labels
+
+
