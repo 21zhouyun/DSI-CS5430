@@ -68,6 +68,7 @@ class IndexingTrainDataset(Dataset):
         self.max_length = max_length
         self.tokenizer = tokenizer
         self.total_len = len(self.train_data)
+        
 
 
     def __len__(self):
@@ -106,7 +107,12 @@ class IndexingCollator(DataCollatorWithPadding):
         # Stack all tokenized outputs into a single tensor
         tokenized_batch = torch.stack(tokenized_outputs, dim=0)
         return tokenized_batch
-    
+
+    # def get_semantic_ids(self, features):
+    #     input_ids = [{'input_ids': x[0]} for x in features]
+    #     semantic_docids = [x[1] for x in features]
+    #     return semantic_docids
+
     def __call__(self, features):
         input_ids = [{'input_ids': x[0]} for x in features]
         semantic_docids = [x[1] for x in features]

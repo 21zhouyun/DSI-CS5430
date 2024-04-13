@@ -1,6 +1,7 @@
-from data import IndexingTrainDataset, IndexingCollator, QueryEvalCollator
+from data import IndexingTrainDataset, IndexingCollator, QueryEvalCollator, Trie
 from transformers import T5Tokenizer, T5ForConditionalGeneration, TrainingArguments, TrainerCallback
 from trainer import IndexingTrainer
+import json
 import numpy as np
 import re
 import torch
@@ -92,6 +93,8 @@ def get_args():
     print("arguments:", args)
     return args
 
+
+
 def main():
     args = get_args()
 
@@ -128,7 +131,7 @@ def main():
                                         max_length=L,
                                         cache_dir='cache',
                                         tokenizer=tokenizer)
-
+    
     ################################################################
     # docid generation constrain, we only generate integer docids.
     # SPIECE_UNDERLINE = "▁"
@@ -146,26 +149,39 @@ def main():
     # def restrict_decode_vocab(batch_idx, prefix_beam):
     #     return INT_TOKEN_IDS
 
-    valid_tokens = [f'c{i}' for i in range(0, 101)]
-    print(valid_tokens)
-    valid_token_ids = tokenizer.convert_tokens_to_ids(valid_tokens)
-    valid_token_ids.append(tokenizer.eos_token_id)
-    print(valid_token_ids)
+    # naive restriction
+    # valid_tokens = [f'c{i}' for i in range(0, 101)]
+    # print(valid_tokens)
+    # valid_token_ids = tokenizer.convert_tokens_to_ids(valid_tokens)
+    # valid_token_ids.append(tokenizer.eos_token_id)
+    # print(valid_token_ids)
+    # def restrict_decode_vocab(batch_idx, prefix_beam):
+    #     return valid_token_ids
 
-    def restrict_decode_vocab(batch_idx, prefix_beam):
-        return valid_token_ids
+    def parse_sequence(sequence):
+        return re.findall(r'c\d+', sequence)
+
+    trie = Trie()
+    # Populate the Trie with parsed data
+    with open("data/NQ/NQ_10k_multi_task_train_semantic_ids2.json") as f:
+        restricted_id_set = []
+        for line in f:
+            data = json.loads(line)
+            restricted_id_set.append(data["semantic_ids"])
+
+    for sequence in restricted_id_set:
+        tokens = parse_sequence(sequence)
+        print("tokens: ", tokens)
+        trie.insert(tokens)
     
-    # def setup_restricted_vocab(tokenizer, valid_semantic_ids):
-    #     restricted_vocab = []
-    #     for valid_semantic_id in valid_semantic_ids:
-    #         print(valid_semantic_id)
-    #         valid_semantic_id = re.sub(r"(c\d+)", r"\1 ", valid_semantic_id).strip()
-    #         tokenized_output = tokenizer(valid_semantic_id)
-    #         # Tokenize each valid semantic ID and retrieve its token IDs
-    #         tokens = tokenizer.tokenize(valid_semantic_id)
-    #         token_ids = tokenizer.convert_tokens_to_ids(tokens)
-    #         print(semantic_valid_id)
-    #         restricted_vocab.extend(token_ids)
+    def restrict_decode_vocab(batch_idx, sent_so_far):
+        # Get the last token to check valid continuations in the trie
+        last_token = tokenizer.decode(sent_so_far[-1]).strip()
+        print("last token: ", last_token)
+        valid_next_tokens = trie.get_valid_next_tokens(last_token)
+        print("valid_next_tokens: ", valid_next_tokens)
+        valid_next_token_ids = tokenizer.convert_tokens_to_ids(valid_next_tokens)
+        return valid_next_token_ids if valid_next_tokens else [tokenizer.eos_token_id]
 
 
     # After initializing your tokenizer and trie(havent initialze trie, but the class Trie is already in data.py)

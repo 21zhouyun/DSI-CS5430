@@ -1,0 +1,139 @@
+Using custom data configuration default-afb2cac7f909cb5f
+Reusing dataset json (cache/json/default-afb2cac7f909cb5f/0.0.0/ac0ca5f5289a6cf108e706efcf040422dbbfa8e658dee6a819f20d76bb84d26b)
+  0%|          | 0/1 [00:00<?, ?it/s]100%|██████████| 1/1 [00:00<00:00, 45.19it/s]
+Using custom data configuration default-afb2cac7f909cb5f
+Reusing dataset json (cache/json/default-afb2cac7f909cb5f/0.0.0/ac0ca5f5289a6cf108e706efcf040422dbbfa8e658dee6a819f20d76bb84d26b)
+  0%|          | 0/1 [00:00<?, ?it/s]100%|██████████| 1/1 [00:00<00:00, 16.57it/s]
+Using custom data configuration default-b928c18fed355c31
+Reusing dataset json (cache/json/default-b928c18fed355c31/0.0.0/ac0ca5f5289a6cf108e706efcf040422dbbfa8e658dee6a819f20d76bb84d26b)
+  0%|          | 0/1 [00:00<?, ?it/s]100%|██████████| 1/1 [00:00<00:00, 440.12it/s]
+max_steps is given, it will override any value given in num_train_epochs
+/home/qiyuan/.conda/envs/dsi/lib/python3.8/site-packages/transformers/optimization.py:306: FutureWarning: This implementation of AdamW is deprecated and will be removed in a future version. Use the PyTorch implementation torch.optim.AdamW instead, or set `no_deprecation_warning=True` to disable this warning
+  warnings.warn(
+***** Running training *****
+  Num examples = 18000
+  Num Epochs = 7093
+  Instantaneous batch size per device = 128
+  Total train batch size (w. parallel, distributed & accumulation) = 128
+  Gradient Accumulation steps = 1
+  Total optimization steps = 1000000
+Automatic Weights & Biases logging enabled, to disable set os.environ["WANDB_DISABLED"] = "true"
+wandb: Currently logged in as: hodavid538 (qyoo). Use `wandb login --relogin` to force relogin
+wandb: wandb version 0.16.6 is available!  To upgrade, please run:
+wandb:  $ pip install wandb --upgrade
+wandb: Tracking run with wandb version 0.16.4
+wandb: Run data is saved locally in /home/qiyuan/DSI-CS5430/wandb/run-20240414_013922-rc8oxqjt
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run results
+wandb: ⭐️ View project at https://wandb.ai/qyoo/huggingface
+wandb: 🚀 View run at https://wandb.ai/qyoo/huggingface/runs/rc8oxqjt
+  0%|          | 0/1000000 [00:00<?, ?it/s]wandb: - 0.012 MB of 0.012 MB uploadedwandb: \ 0.012 MB of 0.012 MB uploadedwandb: | 0.012 MB of 0.012 MB uploadedwandb: / 0.012 MB of 0.012 MB uploadedwandb: - 0.033 MB of 0.044 MB uploaded (0.002 MB deduped)wandb: \ 0.033 MB of 0.052 MB uploaded (0.002 MB deduped)wandb: | 0.052 MB of 0.052 MB uploaded (0.002 MB deduped)wandb: / 0.052 MB of 0.052 MB uploaded (0.002 MB deduped)wandb: 🚀 View run results at: https://wandb.ai/qyoo/huggingface/runs/rc8oxqjt
+wandb: ️⚡ View job at https://wandb.ai/qyoo/huggingface/jobs/QXJ0aWZhY3RDb2xsZWN0aW9uOjE2MjI4OTc4NQ==/version_details/v1
+wandb: Synced 6 W&B file(s), 0 media file(s), 2 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./wandb/run-20240414_013922-rc8oxqjt/logs
+Traceback (most recent call last):
+  File "train.py", line 231, in <module>
+    main()
+  File "train.py", line 227, in main
+    trainer.train()
+  File "/home/qiyuan/.conda/envs/dsi/lib/python3.8/site-packages/transformers/trainer.py", line 1400, in train
+    tr_loss_step = self.training_step(model, inputs)
+  File "/home/qiyuan/.conda/envs/dsi/lib/python3.8/site-packages/transformers/trainer.py", line 1984, in training_step
+    loss = self.compute_loss(model, inputs)
+  File "/home/qiyuan/DSI-CS5430/trainer.py", line 22, in compute_loss
+    loss = model(input_ids=inputs['input_ids'], attention_mask=inputs['attention_mask'], labels = inputs['labels']).loss
+  File "/home/qiyuan/.conda/envs/dsi/lib/python3.8/site-packages/torch/nn/modules/module.py", line 1511, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/qiyuan/.conda/envs/dsi/lib/python3.8/site-packages/torch/nn/modules/module.py", line 1520, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/qiyuan/.conda/envs/dsi/lib/python3.8/site-packages/transformers/models/t5/modeling_t5.py", line 1635, in forward
+    decoder_outputs = self.decoder(
+  File "/home/qiyuan/.conda/envs/dsi/lib/python3.8/site-packages/torch/nn/modules/module.py", line 1511, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/qiyuan/.conda/envs/dsi/lib/python3.8/site-packages/torch/nn/modules/module.py", line 1520, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/qiyuan/.conda/envs/dsi/lib/python3.8/site-packages/transformers/models/t5/modeling_t5.py", line 1030, in forward
+    layer_outputs = layer_module(
+  File "/home/qiyuan/.conda/envs/dsi/lib/python3.8/site-packages/torch/nn/modules/module.py", line 1511, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/qiyuan/.conda/envs/dsi/lib/python3.8/site-packages/torch/nn/modules/module.py", line 1520, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/qiyuan/.conda/envs/dsi/lib/python3.8/site-packages/transformers/models/t5/modeling_t5.py", line 717, in forward
+    hidden_states = self.layer[-1](hidden_states)
+  File "/home/qiyuan/.conda/envs/dsi/lib/python3.8/site-packages/torch/nn/modules/module.py", line 1511, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/qiyuan/.conda/envs/dsi/lib/python3.8/site-packages/torch/nn/modules/module.py", line 1520, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/qiyuan/.conda/envs/dsi/lib/python3.8/site-packages/transformers/models/t5/modeling_t5.py", line 327, in forward
+    forwarded_states = self.DenseReluDense(forwarded_states)
+  File "/home/qiyuan/.conda/envs/dsi/lib/python3.8/site-packages/torch/nn/modules/module.py", line 1511, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/qiyuan/.conda/envs/dsi/lib/python3.8/site-packages/torch/nn/modules/module.py", line 1520, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/qiyuan/.conda/envs/dsi/lib/python3.8/site-packages/transformers/models/t5/modeling_t5.py", line 287, in forward
+    hidden_states = self.dropout(hidden_states)
+  File "/home/qiyuan/.conda/envs/dsi/lib/python3.8/site-packages/torch/nn/modules/module.py", line 1511, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/qiyuan/.conda/envs/dsi/lib/python3.8/site-packages/torch/nn/modules/module.py", line 1520, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/qiyuan/.conda/envs/dsi/lib/python3.8/site-packages/torch/nn/modules/dropout.py", line 59, in forward
+    return F.dropout(input, self.p, self.training, self.inplace)
+  File "/home/qiyuan/.conda/envs/dsi/lib/python3.8/site-packages/torch/nn/functional.py", line 1268, in dropout
+    return _VF.dropout_(input, p, training) if inplace else _VF.dropout(input, p, training)
+torch.cuda.OutOfMemoryError: CUDA out of memory. Tried to allocate 768.00 MiB. GPU 0 has a total capacity of 23.68 GiB of which 373.50 MiB is free. Including non-PyTorch memory, this process has 23.31 GiB memory in use. Of the allocated memory 22.24 GiB is allocated by PyTorch, and 842.46 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+Exception in thread NetStatThr:
+Traceback (most recent call last):
+  File "/home/qiyuan/.conda/envs/dsi/lib/python3.8/threading.py", line 932, in _bootstrap_inner
+Exception in thread IntMsgThr:
+Traceback (most recent call last):
+  File "/home/qiyuan/.conda/envs/dsi/lib/python3.8/threading.py", line 932, in _bootstrap_inner
+    self.run()
+  File "/home/qiyuan/.conda/envs/dsi/lib/python3.8/threading.py", line 870, in run
+    self.run()
+  File "/home/qiyuan/.conda/envs/dsi/lib/python3.8/threading.py", line 870, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home/qiyuan/.conda/envs/dsi/lib/python3.8/site-packages/wandb/sdk/wandb_run.py", line 300, in check_internal_messages
+    self._target(*self._args, **self._kwargs)
+  File "/home/qiyuan/.conda/envs/dsi/lib/python3.8/site-packages/wandb/sdk/wandb_run.py", line 268, in check_network_status
+    self._loop_check_status(
+  File "/home/qiyuan/.conda/envs/dsi/lib/python3.8/site-packages/wandb/sdk/wandb_run.py", line 224, in _loop_check_status
+    self._loop_check_status(
+  File "/home/qiyuan/.conda/envs/dsi/lib/python3.8/site-packages/wandb/sdk/wandb_run.py", line 224, in _loop_check_status
+    local_handle = request()
+  File "/home/qiyuan/.conda/envs/dsi/lib/python3.8/site-packages/wandb/sdk/interface/interface.py", line 803, in deliver_internal_messages
+    local_handle = request()
+  File "/home/qiyuan/.conda/envs/dsi/lib/python3.8/site-packages/wandb/sdk/interface/interface.py", line 795, in deliver_network_status
+    return self._deliver_internal_messages(internal_message)
+  File "/home/qiyuan/.conda/envs/dsi/lib/python3.8/site-packages/wandb/sdk/interface/interface_shared.py", line 506, in _deliver_internal_messages
+    return self._deliver_network_status(status)
+  File "/home/qiyuan/.conda/envs/dsi/lib/python3.8/site-packages/wandb/sdk/interface/interface_shared.py", line 500, in _deliver_network_status
+    return self._deliver_record(record)
+  File "/home/qiyuan/.conda/envs/dsi/lib/python3.8/site-packages/wandb/sdk/interface/interface_shared.py", line 449, in _deliver_record
+    handle = mailbox._deliver_record(record, interface=self)
+  File "/home/qiyuan/.conda/envs/dsi/lib/python3.8/site-packages/wandb/sdk/lib/mailbox.py", line 455, in _deliver_record
+    return self._deliver_record(record)
+  File "/home/qiyuan/.conda/envs/dsi/lib/python3.8/site-packages/wandb/sdk/interface/interface_shared.py", line 449, in _deliver_record
+    handle = mailbox._deliver_record(record, interface=self)
+  File "/home/qiyuan/.conda/envs/dsi/lib/python3.8/site-packages/wandb/sdk/lib/mailbox.py", line 455, in _deliver_record
+    interface._publish(record)
+  File "/home/qiyuan/.conda/envs/dsi/lib/python3.8/site-packages/wandb/sdk/interface/interface_sock.py", line 51, in _publish
+    interface._publish(record)
+  File "/home/qiyuan/.conda/envs/dsi/lib/python3.8/site-packages/wandb/sdk/interface/interface_sock.py", line 51, in _publish
+    self._sock_client.send_record_publish(record)
+  File "/home/qiyuan/.conda/envs/dsi/lib/python3.8/site-packages/wandb/sdk/lib/sock_client.py", line 221, in send_record_publish
+    self._sock_client.send_record_publish(record)
+  File "/home/qiyuan/.conda/envs/dsi/lib/python3.8/site-packages/wandb/sdk/lib/sock_client.py", line 221, in send_record_publish
+    self.send_server_request(server_req)
+  File "/home/qiyuan/.conda/envs/dsi/lib/python3.8/site-packages/wandb/sdk/lib/sock_client.py", line 155, in send_server_request
+    self._send_message(msg)
+  File "/home/qiyuan/.conda/envs/dsi/lib/python3.8/site-packages/wandb/sdk/lib/sock_client.py", line 152, in _send_message
+    self.send_server_request(server_req)
+  File "/home/qiyuan/.conda/envs/dsi/lib/python3.8/site-packages/wandb/sdk/lib/sock_client.py", line 155, in send_server_request
+    sent = self._sock.send(data)
+BrokenPipeError: [Errno 32] Broken pipe
+                                                                                                                                                                                               self._send_message(msg)
+  File "/home/qiyuan/.conda/envs/dsi/lib/python3.8/site-packages/wandb/sdk/lib/sock_client.py", line 152, in _send_message
+    self._sendall_with_error_handle(header + data)
+  File "/home/qiyuan/.conda/envs/dsi/lib/python3.8/site-packages/wandb/sdk/lib/sock_client.py", line 130, in _sendall_with_error_handle
+    sent = self._sock.send(data)
+BrokenPipeError: [Errno 32] Broken pipe
