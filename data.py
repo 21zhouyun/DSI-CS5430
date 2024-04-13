@@ -1,6 +1,8 @@
 from dataclasses import dataclass
+import re
 
 import datasets
+import torch
 from torch.utils.data import Dataset
 from transformers import PreTrainedTokenizer, DataCollatorWithPadding
 
@@ -70,7 +72,7 @@ class IndexingTrainDataset(Dataset):
 
     def __len__(self):
         return self.total_len
-
+    
     def __getitem__(self, item):
         data = self.train_data[item]
 
@@ -78,33 +80,54 @@ class IndexingTrainDataset(Dataset):
                                    return_tensors="pt",
                                    truncation='only_first',
                                    max_length=self.max_length).input_ids[0]
-        # return input_ids, str(data['text_id'])
+        # print(input_ids, ": ",str(data['semantic_ids']))                          
         return input_ids, str(data['semantic_ids'])
-        
+
 
 
 @dataclass
 class IndexingCollator(DataCollatorWithPadding):
+    def preprocess_docids(self, docids):
+        # Ensure docids is a string
+        if not isinstance(docids, str):
+            docids = str(docids) if docids is not None else ''
+        # Insert spaces between "cXX" patterns
+        spaced_docids = re.sub(r"(c\d+)", r"\1 ", docids).strip()
+        return spaced_docids
+
+    def tokenize_docids(self, docids_batch, tokenizer):
+        # Tokenize each document ID in the batch after preprocessing
+        tokenized_outputs = [tokenizer(
+            self.preprocess_docids(docid),
+            padding="max_length",
+            truncation=True,
+            return_tensors="pt"
+        )['input_ids'].squeeze(0) for docid in docids_batch]
+        # Stack all tokenized outputs into a single tensor
+        tokenized_batch = torch.stack(tokenized_outputs, dim=0)
+        return tokenized_batch
+    
     def __call__(self, features):
-        features = features[:500]
         input_ids = [{'input_ids': x[0]} for x in features]
         semantic_docids = [x[1] for x in features]
+        print("input_ids: ",input_ids)
+        print("semantic_docids: ",semantic_docids)
         inputs = super().__call__(input_ids)
 
-        labels = self.tokenizer(
-            semantic_docids, padding="longest", return_tensors="pt"
-        ).input_ids
+        # Tokenize all semantic docids in the batch
+        labels = self.tokenize_docids(semantic_docids, self.tokenizer)
+        print("labels: ",labels)
+        # Set padding token IDs in labels to -100
+        # labels[labels == self.tokenizer.pad_token_id] = -100
 
-        # replace padding token id's of the labels by -100 according to https://huggingface.co/docs/transformers/model_doc/t5#training
-        labels[labels == self.tokenizer.pad_token_id] = -100
         inputs['labels'] = labels
+        print("inputs: ", inputs)
         return inputs
 
 
 @dataclass
 class QueryEvalCollator(DataCollatorWithPadding):
     def __call__(self, features):
-        features = features[:500]
         input_ids = [{'input_ids': x[0]} for x in features]
         labels = [x[1] for x in features]
         inputs = super().__call__(input_ids)

@@ -6,4 +6,4 @@ cd DSI-CS5430
 source ~/.bashrc
 eval "$(conda shell.bash hook)"
 conda activate dsi
-python train.py
+python train.py 

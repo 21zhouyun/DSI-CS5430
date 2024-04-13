@@ -2,6 +2,7 @@ from data import IndexingTrainDataset, IndexingCollator, QueryEvalCollator
 from transformers import T5Tokenizer, T5ForConditionalGeneration, TrainingArguments, TrainerCallback
 from trainer import IndexingTrainer
 import numpy as np
+import re
 import torch
 import wandb
 from torch.utils.data import DataLoader
@@ -83,8 +84,8 @@ def compute_metrics(eval_preds):
 
 def get_args():
     parser = argparse.ArgumentParser(description='Optional app description')
-    parser.add_argument('--train_data', type=str, default='data/NQ/NQ_10k_multi_task_train_semantic_ids.json')
-    parser.add_argument('--validation_data', type=str, default='data/NQ/NQ_10k_valid_semantic_ids.json')
+    parser.add_argument('--train_data', type=str, default='data/NQ/NQ_10k_multi_task_train_semantic_ids2.json')
+    parser.add_argument('--validation_data', type=str, default='data/NQ/NQ_10k_valid_semantic_ids2.json')
     parser.add_argument('--output_dir', type=str, default='results')
 
     args = parser.parse_args()
@@ -98,11 +99,18 @@ def main():
     L = 32  # only use the first 32 tokens of documents (including title)
 
     # We use wandb to log Hits scores after each epoch. Note, this script does not save model checkpoints.
-    wandb.login()
-    wandb.init(project="DSI", name='NQ-10k-t5-base')
+    # wandb.login()
+    # wandb.init(project="DSI", name='NQ-10k-t5-base')
 
+    # Define new special tokens
+    valid_new_tokens = [f'c{i}' for i in range(0, 101)]
     tokenizer = T5Tokenizer.from_pretrained(model_name, cache_dir='cache')
+    # Add new tokens
+    tokenizer.add_special_tokens({'additional_special_tokens': valid_new_tokens})
+
     model = T5ForConditionalGeneration.from_pretrained(model_name, cache_dir='cache')
+    # Inform the model of the change in token embeddings
+    model.resize_token_embeddings(len(tokenizer))
 
     train_dataset = IndexingTrainDataset(path_to_data=args.train_data,
                                          max_length=L,
@@ -138,17 +146,27 @@ def main():
     # def restrict_decode_vocab(batch_idx, prefix_beam):
     #     return INT_TOKEN_IDS
 
+    valid_tokens = [f'c{i}' for i in range(0, 101)]
+    print(valid_tokens)
+    valid_token_ids = tokenizer.convert_tokens_to_ids(valid_tokens)
+    valid_token_ids.append(tokenizer.eos_token_id)
+    print(valid_token_ids)
 
-    def restrict_decode_vocab_semantic(tokenizer, trie):
-        def inner(batch_idx, prefix_beam):
-            # Convert token IDs to their corresponding strings, e.g., 'c2', 'c38', etc.
-            prefix_str = [tokenizer.decode([token_id], skip_special_tokens=True) for token_id in prefix_beam]
-            # Get valid next tokens from the trie
-            valid_next_tokens = trie.get_valid_next_tokens(prefix_str)
-            # Convert valid next tokens back to their corresponding token IDs
-            valid_next_token_ids = [tokenizer.encode(token, add_special_tokens=False)[0] for token in valid_next_tokens]
-            return valid_next_token_ids
-        return inner
+    def restrict_decode_vocab(batch_idx, prefix_beam):
+        return valid_token_ids
+    
+    # def setup_restricted_vocab(tokenizer, valid_semantic_ids):
+    #     restricted_vocab = []
+    #     for valid_semantic_id in valid_semantic_ids:
+    #         print(valid_semantic_id)
+    #         valid_semantic_id = re.sub(r"(c\d+)", r"\1 ", valid_semantic_id).strip()
+    #         tokenized_output = tokenizer(valid_semantic_id)
+    #         # Tokenize each valid semantic ID and retrieve its token IDs
+    #         tokens = tokenizer.tokenize(valid_semantic_id)
+    #         token_ids = tokenizer.convert_tokens_to_ids(tokens)
+    #         print(semantic_valid_id)
+    #         restricted_vocab.extend(token_ids)
+
 
     # After initializing your tokenizer and trie(havent initialze trie, but the class Trie is already in data.py)
     ################################################################
@@ -165,11 +183,11 @@ def main():
         max_steps=1000000,
         dataloader_drop_last=False,  # necessary
         report_to='wandb',
-        # logging_steps=50,
-        logging_steps=5,
+        logging_steps=50,
+        # logging_steps=5,
         save_strategy='steps',
-        # save_steps=100,
-        save_steps=5,
+        save_steps=100,
+        # save_steps=5,
         save_total_limit=3,
         # fp16=True,  # gives 0/nan loss at some point during training, seems this is a transformers bug.
         dataloader_num_workers=2,

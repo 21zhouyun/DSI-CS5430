@@ -10,7 +10,16 @@ class IndexingTrainer(Trainer):
         self.restrict_decode_vocab = restrict_decode_vocab
 
     def compute_loss(self, model, inputs, return_outputs=False):
-        loss = model(input_ids=inputs['input_ids'], attention_mask=inputs['attention_mask'], labels=inputs['labels']).loss
+        # labels = inputs['labels']
+        # if isinstance(inputs['labels'], torch.Tensor):
+        #     labels = inputs['labels'].to(model.device)
+        # elif isinstance(inputs['labels'], dict):
+        #     # Assuming 'labels' is correctly set up in the dict and is already a tensor
+        #     labels = inputs['labels']['input_ids'].to(model.device)
+        # else:
+        #     labels = torch.tensor(inputs['labels'], dtype=torch.long, device=model.device)
+        #     print("inputs: ", inputs, " labels: ", labels, " attention_mask: ", inputs['attention_mask'])
+        loss = model(input_ids=inputs['input_ids'], attention_mask=inputs['attention_mask'], labels = inputs['labels']).loss
         if return_outputs:
             return loss, [None, None]  # fake outputs
         return loss

@@ -1,0 +1,21 @@
+Using custom data configuration default-9c9672b5779f3d00
+  0%|          | 0/1 [00:00<?, ?it/s]100%|██████████| 1/1 [00:00<00:00, 3037.15it/s]
+  0%|          | 0/1 [00:00<?, ?it/s]100%|██████████| 1/1 [00:00<00:00, 615.36it/s]
+Traceback (most recent call last):
+  File "train.py", line 216, in <module>
+    main()
+  File "train.py", line 116, in main
+    train_dataset = IndexingTrainDataset(path_to_data=args.train_data,
+  File "/home/qiyuan/DSI-CS5430/data.py", line 60, in __init__
+    self.train_data = datasets.load_dataset(
+  File "/home/qiyuan/.conda/envs/dsi/lib/python3.8/site-packages/datasets/load.py", line 1702, in load_dataset
+    builder_instance.download_and_prepare(
+  File "/home/qiyuan/.conda/envs/dsi/lib/python3.8/site-packages/datasets/builder.py", line 594, in download_and_prepare
+    self._download_and_prepare(
+  File "/home/qiyuan/.conda/envs/dsi/lib/python3.8/site-packages/datasets/builder.py", line 683, in _download_and_prepare
+    self._prepare_split(split_generator, **prepare_split_kwargs)
+  File "/home/qiyuan/.conda/envs/dsi/lib/python3.8/site-packages/datasets/builder.py", line 1137, in _prepare_split
+    num_examples, num_bytes = writer.finalize()
+  File "/home/qiyuan/.conda/envs/dsi/lib/python3.8/site-packages/datasets/arrow_writer.py", line 530, in finalize
+    raise ValueError("Please pass `features` or at least one example when writing data")
+ValueError: Please pass `features` or at least one example when writing data

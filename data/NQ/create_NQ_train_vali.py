@@ -15,8 +15,8 @@ random.shuffle(rand_inds)
 title_set = set()
 current_docid = 0
 
-with open('NQ_10k_multi_task_train.json', 'w') as tf, \
-        open('NQ_10k_valid.json', 'w') as vf:
+with open('NQ_10k_multi_task_train_semantic_ids2.json', 'w') as tf, \
+        open('NQ_10k_valid_semantic_ids2.json', 'w') as vf:
     for ind in rand_inds:
         title = data[ind]['document']['title']  # we use title as the doc identifier to prevent two docs have the same text
         if title not in title_set:

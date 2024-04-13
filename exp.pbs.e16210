@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "train.py", line 3, in <module>
+    from trainer import IndexingTrainer
+  File "/home/qiyuan/DSI-CS5430/trainer.py", line 22
+    loss = model(input_ids=inputs['input_ids'], attention_mask=inputs['attention_mask'], labels).loss
+                                                                                         ^
+SyntaxError: positional argument follows keyword argument
