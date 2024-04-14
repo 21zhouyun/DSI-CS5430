@@ -1,0 +1,28 @@
+Sun Apr 14 12:50:14 2024       
++---------------------------------------------------------------------------------------+
+| NVIDIA-SMI 545.23.08              Driver Version: 545.23.08    CUDA Version: 12.3     |
+|-----------------------------------------+----------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id        Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |         Memory-Usage | GPU-Util  Compute M. |
+|                                         |                      |               MIG M. |
+|=========================================+======================+======================|
+|   0  NVIDIA RTX A5000               On  | 00000000:20:00.0 Off |                    0 |
+| 30%   30C    P8              19W / 230W |      2MiB / 23028MiB |      0%      Default |
+|                                         |                      |                  N/A |
++-----------------------------------------+----------------------+----------------------+
+                                                                                         
++---------------------------------------------------------------------------------------+
+| Processes:                                                                            |
+|  GPU   GI   CI        PID   Type   Process name                            GPU Memory |
+|        ID   ID                                                             Usage      |
+|=======================================================================================|
+|  No running processes found                                                           |
++---------------------------------------------------------------------------------------+
+{'loss': 32.6178, 'learning_rate': 0.0004797979797979798, 'epoch': 0.0}
+{'loss': 15.5362, 'learning_rate': 0.00045454545454545455, 'epoch': 0.0}
+{'eval_accuracy': 0.0, 'eval_runtime': 305.1205, 'eval_samples_per_second': 58.993, 'eval_steps_per_second': 14.748, 'epoch': 0.0}
+{'loss': 9.1492, 'learning_rate': 0.0004292929292929293, 'epoch': 0.0}
+{'loss': 6.2346, 'learning_rate': 0.00040404040404040404, 'epoch': 0.0}
+{'eval_accuracy': 0.0, 'eval_runtime': 327.3307, 'eval_samples_per_second': 54.99, 'eval_steps_per_second': 13.748, 'epoch': 0.0}
+{'loss': 5.1739, 'learning_rate': 0.0003787878787878788, 'epoch': 0.01}
+{'loss': 5.4304, 'learning_rate': 0.00035353535353535354, 'epoch': 0.01}

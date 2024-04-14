@@ -39,6 +39,18 @@ class Trie:
             node = node.children[part]
         return True
 
+    def insert(self, tokens):
+        current_node = self.root
+        for token in tokens:
+            if token not in current_node.children:
+                current_node.children[token] = TrieNode()
+            current_node = current_node.children[token]
+        current_node.is_end_of_word = True
+
+    def get_valid_first_tokens(self):
+        # Return all children of the root node
+        return list(self.root.children.keys())
+
     def get_valid_next_tokens(self, prefix):
         node = self.root
         for part in prefix:
@@ -116,18 +128,16 @@ class IndexingCollator(DataCollatorWithPadding):
     def __call__(self, features):
         input_ids = [{'input_ids': x[0]} for x in features]
         semantic_docids = [x[1] for x in features]
-        print("input_ids: ",input_ids)
-        print("semantic_docids: ",semantic_docids)
+        # print("input_ids: ",input_ids)
+        # print("semantic_docids: ",semantic_docids)
         inputs = super().__call__(input_ids)
-
         # Tokenize all semantic docids in the batch
         labels = self.tokenize_docids(semantic_docids, self.tokenizer)
-        print("labels: ",labels)
+        # print("labels: ",labels)
         # Set padding token IDs in labels to -100
-        # labels[labels == self.tokenizer.pad_token_id] = -100
-
+        labels[labels == self.tokenizer.pad_token_id] = -100
         inputs['labels'] = labels
-        print("inputs: ", inputs)
+        # print("inputs: ", inputs)
         return inputs
 
 
