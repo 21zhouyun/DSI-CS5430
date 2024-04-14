@@ -1,64 +1,0 @@
-Using custom data configuration default-d67ad817982f894f
-Reusing dataset json (cache/json/default-d67ad817982f894f/0.0.0/ac0ca5f5289a6cf108e706efcf040422dbbfa8e658dee6a819f20d76bb84d26b)
-  0%|          | 0/1 [00:00<?, ?it/s]100%|██████████| 1/1 [00:00<00:00, 31.59it/s]
-Using custom data configuration default-d67ad817982f894f
-Reusing dataset json (cache/json/default-d67ad817982f894f/0.0.0/ac0ca5f5289a6cf108e706efcf040422dbbfa8e658dee6a819f20d76bb84d26b)
-  0%|          | 0/1 [00:00<?, ?it/s]100%|██████████| 1/1 [00:00<00:00, 15.57it/s]
-Using custom data configuration default-d37247516db72f78
-Reusing dataset json (cache/json/default-d37247516db72f78/0.0.0/ac0ca5f5289a6cf108e706efcf040422dbbfa8e658dee6a819f20d76bb84d26b)
-  0%|          | 0/1 [00:00<?, ?it/s]100%|██████████| 1/1 [00:00<00:00, 130.08it/s]
-max_steps is given, it will override any value given in num_train_epochs
-/home/qiyuan/.conda/envs/dsi/lib/python3.8/site-packages/transformers/optimization.py:306: FutureWarning: This implementation of AdamW is deprecated and will be removed in a future version. Use the PyTorch implementation torch.optim.AdamW instead, or set `no_deprecation_warning=True` to disable this warning
-  warnings.warn(
-***** Running training *****
-  Num examples = 18000
-  Num Epochs = 7093
-  Instantaneous batch size per device = 128
-  Total train batch size (w. parallel, distributed & accumulation) = 128
-  Gradient Accumulation steps = 1
-  Total optimization steps = 1000000
-Automatic Weights & Biases logging enabled, to disable set os.environ["WANDB_DISABLED"] = "true"
-wandb: Currently logged in as: hodavid538 (qyoo). Use `wandb login --relogin` to force relogin
-wandb: wandb version 0.16.6 is available!  To upgrade, please run:
-wandb:  $ pip install wandb --upgrade
-wandb: Tracking run with wandb version 0.16.4
-wandb: Run data is saved locally in /home/qiyuan/DSI-CS5430/wandb/run-20240413_235444-mthgp3hn
-wandb: Run `wandb offline` to turn off syncing.
-wandb: Syncing run results
-wandb: ⭐️ View project at https://wandb.ai/qyoo/huggingface
-wandb: 🚀 View run at https://wandb.ai/qyoo/huggingface/runs/mthgp3hn
-  0%|          | 0/1000000 [00:00<?, ?it/s]wandb: - 0.012 MB of 0.012 MB uploadedwandb: \ 0.012 MB of 0.012 MB uploadedwandb: | 0.012 MB of 0.012 MB uploadedwandb: / 0.012 MB of 0.012 MB uploadedwandb: - 0.033 MB of 0.049 MB uploadedwandb: \ 0.040 MB of 0.049 MB uploadedwandb: | 0.049 MB of 0.049 MB uploadedwandb: 🚀 View run results at: https://wandb.ai/qyoo/huggingface/runs/mthgp3hn
-wandb: ️⚡ View job at https://wandb.ai/qyoo/huggingface/jobs/QXJ0aWZhY3RDb2xsZWN0aW9uOjE2MjI4OTc4NQ==/version_details/v0
-wandb: Synced 6 W&B file(s), 0 media file(s), 2 artifact file(s) and 0 other file(s)
-wandb: Find logs at: ./wandb/run-20240413_235444-mthgp3hn/logs
-Traceback (most recent call last):
-  File "train.py", line 215, in <module>
-    main()
-  File "train.py", line 211, in main
-    trainer.train()
-  File "/home/qiyuan/.conda/envs/dsi/lib/python3.8/site-packages/transformers/trainer.py", line 1374, in train
-    for step, inputs in enumerate(epoch_iterator):
-  File "/home/qiyuan/.conda/envs/dsi/lib/python3.8/site-packages/torch/utils/data/dataloader.py", line 631, in __next__
-    data = self._next_data()
-  File "/home/qiyuan/.conda/envs/dsi/lib/python3.8/site-packages/torch/utils/data/dataloader.py", line 1346, in _next_data
-    return self._process_data(data)
-  File "/home/qiyuan/.conda/envs/dsi/lib/python3.8/site-packages/torch/utils/data/dataloader.py", line 1372, in _process_data
-    data.reraise()
-  File "/home/qiyuan/.conda/envs/dsi/lib/python3.8/site-packages/torch/_utils.py", line 722, in reraise
-    raise exception
-TypeError: Caught TypeError in DataLoader worker process 0.
-Original Traceback (most recent call last):
-  File "/home/qiyuan/.conda/envs/dsi/lib/python3.8/site-packages/torch/utils/data/_utils/worker.py", line 308, in _worker_loop
-    data = fetcher.fetch(index)
-  File "/home/qiyuan/.conda/envs/dsi/lib/python3.8/site-packages/torch/utils/data/_utils/fetch.py", line 54, in fetch
-    return self.collate_fn(data)
-  File "/home/qiyuan/DSI-CS5430/data.py", line 110, in __call__
-    labels = self.tokenize_docids(semantic_docids, self.tokenizer)
-  File "/home/qiyuan/DSI-CS5430/data.py", line 96, in tokenize_docids
-    preprocessed_docids = self.preprocess_docids(docids)
-  File "/home/qiyuan/DSI-CS5430/data.py", line 91, in preprocess_docids
-    spaced_docids = re.sub(r"(c\d+)", r"\1 ", docids).strip()
-  File "/home/qiyuan/.conda/envs/dsi/lib/python3.8/re.py", line 210, in sub
-    return _compile(pattern, flags).sub(repl, string, count)
-TypeError: expected string or bytes-like object
-

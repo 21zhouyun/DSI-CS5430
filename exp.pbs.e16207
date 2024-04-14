@@ -1,64 +1,0 @@
-Using custom data configuration default-d67ad817982f894f
-Reusing dataset json (cache/json/default-d67ad817982f894f/0.0.0/ac0ca5f5289a6cf108e706efcf040422dbbfa8e658dee6a819f20d76bb84d26b)
-  0%|          | 0/1 [00:00<?, ?it/s]100%|██████████| 1/1 [00:00<00:00, 33.57it/s]
-Using custom data configuration default-d67ad817982f894f
-Reusing dataset json (cache/json/default-d67ad817982f894f/0.0.0/ac0ca5f5289a6cf108e706efcf040422dbbfa8e658dee6a819f20d76bb84d26b)
-  0%|          | 0/1 [00:00<?, ?it/s]100%|██████████| 1/1 [00:00<00:00, 15.82it/s]
-Using custom data configuration default-d37247516db72f78
-Reusing dataset json (cache/json/default-d37247516db72f78/0.0.0/ac0ca5f5289a6cf108e706efcf040422dbbfa8e658dee6a819f20d76bb84d26b)
-  0%|          | 0/1 [00:00<?, ?it/s]100%|██████████| 1/1 [00:00<00:00, 194.57it/s]
-max_steps is given, it will override any value given in num_train_epochs
-/home/qiyuan/.conda/envs/dsi/lib/python3.8/site-packages/transformers/optimization.py:306: FutureWarning: This implementation of AdamW is deprecated and will be removed in a future version. Use the PyTorch implementation torch.optim.AdamW instead, or set `no_deprecation_warning=True` to disable this warning
-  warnings.warn(
-***** Running training *****
-  Num examples = 18000
-  Num Epochs = 7093
-  Instantaneous batch size per device = 128
-  Total train batch size (w. parallel, distributed & accumulation) = 128
-  Gradient Accumulation steps = 1
-  Total optimization steps = 1000000
-Automatic Weights & Biases logging enabled, to disable set os.environ["WANDB_DISABLED"] = "true"
-wandb: Currently logged in as: hodavid538 (qyoo). Use `wandb login --relogin` to force relogin
-wandb: wandb version 0.16.6 is available!  To upgrade, please run:
-wandb:  $ pip install wandb --upgrade
-wandb: Tracking run with wandb version 0.16.4
-wandb: Run data is saved locally in /home/qiyuan/DSI-CS5430/wandb/run-20240413_235850-9o8sxttm
-wandb: Run `wandb offline` to turn off syncing.
-wandb: Syncing run results
-wandb: ⭐️ View project at https://wandb.ai/qyoo/huggingface
-wandb: 🚀 View run at https://wandb.ai/qyoo/huggingface/runs/9o8sxttm
-  0%|          | 0/1000000 [00:00<?, ?it/s]Token indices sequence length is longer than the specified maximum sequence length for this model (789 > 512). Running this sequence through the model will result in indexing errors
-Token indices sequence length is longer than the specified maximum sequence length for this model (790 > 512). Running this sequence through the model will result in indexing errors
-wandb: - 0.012 MB of 0.012 MB uploadedwandb: \ 0.012 MB of 0.012 MB uploadedwandb: | 0.012 MB of 0.020 MB uploadedwandb: / 0.027 MB of 0.027 MB uploadedwandb: - 0.027 MB of 0.027 MB uploadedwandb: 🚀 View run results at: https://wandb.ai/qyoo/huggingface/runs/9o8sxttm
-wandb: ️⚡ View job at https://wandb.ai/qyoo/huggingface/jobs/QXJ0aWZhY3RDb2xsZWN0aW9uOjE2MjI4OTc4NQ==/version_details/v0
-wandb: Synced 6 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
-wandb: Find logs at: ./wandb/run-20240413_235850-9o8sxttm/logs
-Traceback (most recent call last):
-  File "/home/qiyuan/.conda/envs/dsi/lib/python3.8/site-packages/transformers/tokenization_utils_base.py", line 251, in __getattr__
-    return self.data[item]
-KeyError: 'new_zeros'
-
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-  File "train.py", line 215, in <module>
-    main()
-  File "train.py", line 211, in main
-    trainer.train()
-  File "/home/qiyuan/.conda/envs/dsi/lib/python3.8/site-packages/transformers/trainer.py", line 1400, in train
-    tr_loss_step = self.training_step(model, inputs)
-  File "/home/qiyuan/.conda/envs/dsi/lib/python3.8/site-packages/transformers/trainer.py", line 1984, in training_step
-    loss = self.compute_loss(model, inputs)
-  File "/home/qiyuan/DSI-CS5430/trainer.py", line 13, in compute_loss
-    loss = model(input_ids=inputs['input_ids'], attention_mask=inputs['attention_mask'], labels=inputs['labels']).loss
-  File "/home/qiyuan/.conda/envs/dsi/lib/python3.8/site-packages/torch/nn/modules/module.py", line 1511, in _wrapped_call_impl
-    return self._call_impl(*args, **kwargs)
-  File "/home/qiyuan/.conda/envs/dsi/lib/python3.8/site-packages/torch/nn/modules/module.py", line 1520, in _call_impl
-    return forward_call(*args, **kwargs)
-  File "/home/qiyuan/.conda/envs/dsi/lib/python3.8/site-packages/transformers/models/t5/modeling_t5.py", line 1621, in forward
-    decoder_input_ids = self._shift_right(labels)
-  File "/home/qiyuan/.conda/envs/dsi/lib/python3.8/site-packages/transformers/models/t5/modeling_t5.py", line 817, in _shift_right
-    shifted_input_ids = input_ids.new_zeros(input_ids.shape)
-  File "/home/qiyuan/.conda/envs/dsi/lib/python3.8/site-packages/transformers/tokenization_utils_base.py", line 253, in __getattr__
-    raise AttributeError
-AttributeError
