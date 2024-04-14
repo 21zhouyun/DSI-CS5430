@@ -42,31 +42,85 @@ class QueryEvalCallback(TrainerCallback):
             GumbelLogitsProcessor()
         ])
 
-
     def on_epoch_end(self, args, state, control, **kwargs):
         hit_at_1 = 0
         hit_at_10 = 0
-        model = kwargs['model'].eval()
-        for batch in tqdm(self.dataloader, desc='Evaluating dev queries'):
+        model = kwargs['model'].eval()  # Ensure the model is in evaluation mode
+
+        # Evaluation with GumbelLogitsProcessor
+        for batch in tqdm(self.dataloader, desc='Evaluating dev queries with Gumbel'):
             inputs, labels = batch
             with torch.no_grad():
                 batch_beams = model.generate(
                     inputs['input_ids'].to(model.device),
                     max_length=20,
                     num_beams=10,
-                    logits_processor=self.logits_processor,  # TO CHECK
+                    logits_processor=self.logits_processor,  # Using GumbelLogitsProcessor
                     prefix_allowed_tokens_fn=self.restrict_decode_vocab,
                     num_return_sequences=10,
-                    early_stopping=True, ).reshape(inputs['input_ids'].shape[0], 10, -1)
-                for beams, label in zip(batch_beams, labels):
-                    rank_list = self.tokenizer.batch_decode(beams,
-                                                            skip_special_tokens=True)  # beam search should not return repeated docids but somehow due to T5 tokenizer there some repeats.
-                    hits = np.where(np.array(rank_list)[:10] == label)[0]
-                    if len(hits) != 0:
-                        hit_at_10 += 1
-                        if hits[0] == 0:
-                            hit_at_1 += 1
-        self.logger.log({"Hits@1": hit_at_1 / len(self.test_dataset), "Hits@10": hit_at_10 / len(self.test_dataset)})
+                    early_stopping=True,
+                ).reshape(inputs['input_ids'].shape[0], 10, -1)
+                self.evaluate_hits(batch_beams, labels, hit_at_1, hit_at_10)
+
+        # Log results with GumbelLogitsProcessor
+        self.logger.log({"Hits@1 with Gumbel": hit_at_1 / len(self.test_dataset), "Hits@10 with Gumbel": hit_at_10 / len(self.test_dataset)})
+
+        # Reset hit counters for evaluation without GumbelLogitsProcessor
+        hit_at_1 = 0
+        hit_at_10 = 0
+
+        # Evaluation without GumbelLogitsProcessor
+        for batch in tqdm(self.dataloader, desc='Evaluating dev queries without Gumbel'):
+            inputs, labels = batch
+            with torch.no_grad():
+                batch_beams = model.generate(
+                    inputs['input_ids'].to(model.device),
+                    max_length=20,
+                    num_beams=10,
+                    logits_processor=None,  # No GumbelLogitsProcessor
+                    prefix_allowed_tokens_fn=self.restrict_decode_vocab,
+                    num_return_sequences=10,
+                    early_stopping=True,
+                ).reshape(inputs['input_ids'].shape[0], 10, -1)
+                self.evaluate_hits(batch_beams, labels, hit_at_1, hit_at_10)
+
+        # Log results without GumbelLogitsProcessor
+        self.logger.log({"Hits@1 without Gumbel": hit_at_1 / len(self.test_dataset), "Hits@10 without Gumbel": hit_at_10 / len(self.test_dataset)})
+
+    def evaluate_hits(self, batch_beams, labels, hit_at_1, hit_at_10):
+        for beams, label in zip(batch_beams, labels):
+            rank_list = self.tokenizer.batch_decode(beams, skip_special_tokens=False)
+            hits = np.where(np.array(rank_list)[:10] == label)[0]
+            if len(hits) != 0:
+                hit_at_10 += 1
+                if hits[0] == 0:
+                    hit_at_1 += 1
+
+    # def on_epoch_end(self, args, state, control, **kwargs):
+    #     hit_at_1 = 0
+    #     hit_at_10 = 0
+    #     model = kwargs['model'].eval()
+    #     for batch in tqdm(self.dataloader, desc='Evaluating dev queries'):
+    #         inputs, labels = batch
+    #         with torch.no_grad():
+    #             batch_beams = model.generate(
+    #                 inputs['input_ids'].to(model.device),
+    #                 max_length=20,
+    #                 num_beams=10,
+    #                 logits_processor=self.logits_processor,  # TO CHECK
+    #                 prefix_allowed_tokens_fn=self.restrict_decode_vocab,
+    #                 num_return_sequences=10,
+    #                 early_stopping=True, ).reshape(inputs['input_ids'].shape[0], 10, -1)
+    #             for beams, label in zip(batch_beams, labels):
+    #                 rank_list = self.tokenizer.batch_decode(beams,
+    #                                                         skip_special_tokens=True)  # beam search should not return repeated docids but somehow due to T5 tokenizer there some repeats.
+    #                 hits = np.where(np.array(rank_list)[:10] == label)[0]
+    #                 if len(hits) != 0:
+    #                     hit_at_10 += 1
+    #                     if hits[0] == 0:
+    #                         hit_at_1 += 1
+    #     self.logger.log({"Hits@1": hit_at_1 / len(self.test_dataset), "Hits@10": hit_at_10 / len(self.test_dataset)})
+
 
 
 def compute_metrics(eval_preds):
@@ -92,7 +146,6 @@ def get_args():
     args = parser.parse_args()
     # print("arguments:", args)
     return args
-
 
 
 def main():
@@ -134,14 +187,16 @@ def main():
     
 
     trie = Trie()
+    restricted_id_set = []
     # Populate the Trie with parsed data
     # with open("data/NQ/NQ_10k_multi_task_train_semantic_ids2.json") as f:
     #     restricted_id_set = []
     #     for line in f:
     #         data = json.loads(line)
     #         restricted_id_set.append(data["semantic_ids"])
+
     # Assuming restricted_id_set is populated as follows:
-    restricted_id_set = []
+    
     # with open("data/NQ/NQ_10k_multi_task_train_semantic_ids2.json") as f:
     #     for line in f:
     #         data = json.loads(line)
@@ -163,10 +218,10 @@ def main():
     
     def restrict_decode_vocab(batch_idx, sent_so_far):
         # Decode the token IDs to tokens
-        decoded_tokens = tokenizer.convert_ids_to_tokens(sent_so_far)
         # print("sent_so_far: ",sent_so_far)
         # print("decoded_tokens: ", decoded_tokens)
         # Check if the last token is a padding token and handle appropriately
+        decoded_tokens = tokenizer.convert_ids_to_tokens(sent_so_far)
         if decoded_tokens[-1] == tokenizer.pad_token:
             valid_next_tokens = trie.get_valid_first_tokens()
             # print("if pad valid_next_tokens: ", valid_next_tokens)
@@ -185,19 +240,17 @@ def main():
         # print(f"Last token: {last_token if 'last_token' in locals() else 'PAD'}, valid next tokens: {valid_next_tokens if 'valid_next_tokens' in locals() else 'None'}")
         return valid_next_token_ids
 
-    # After initializing your tokenizer and trie(havent initialze trie, but the class Trie is already in data.py)
-    ################################################################
-
     training_args = TrainingArguments(
         output_dir=args.output_dir,
         learning_rate=0.0005,
         warmup_steps=10000,
+        # warmup_steps=100,
         # warmup_steps=1,
         # weight_decay=0.01,
-        per_device_train_batch_size=128,
-        per_device_eval_batch_size=128,
-        # per_device_train_batch_size=4,
-        # per_device_eval_batch_size=4,
+        # per_device_train_batch_size=128,
+        # per_device_eval_batch_size=128,
+        per_device_train_batch_size=16,
+        per_device_eval_batch_size=16,
         evaluation_strategy='steps',
         eval_steps=1000,
         # eval_steps=10,
